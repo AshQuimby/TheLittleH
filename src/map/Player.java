@@ -483,7 +483,7 @@ public class Player extends Entity {
                game.showTimer();
             } else if (!win && tile.hasTag("end")) {
                game.showTimer();
-               SoundEngine.playSound("effects/win.wav");
+               SoundEngine.playSound("effects/win_level.wav");
                for (int i = 0; i < 16; i++) {
                   game.addParticle(new Particle(x + width / 4, y + height / 4, (float) ((Math.random() - 0.5) * -16), (float) ((Math.random() - 0.5) * -16), 24, 24, 3, 3, 1, 0.96f, 0f, (int) (Math.random() * 2), 0, "particles/twinkle.png", 120));
                }
