@@ -158,17 +158,27 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
    }
    
    public static void loadCustomTiles() {
-      File packsFolder = new File((inArchive ? "./" : "../") + "tile_packs");
-      try { if (!packsFolder.exists()) Files.createDirectory(Paths.get(packsFolder.getPath())); } catch (Exception e) { e.printStackTrace(); }
-      File[] packs = packsFolder.listFiles();
-      Set<Tile> tiles = new HashSet<>();
-      for (File pack : packs) {
-         File scriptsFolder = new File(pack.getPath().replace("\\", "/") + "/scripts");
-         tiles.addAll(searchForScripts(scriptsFolder));
-      }
-      for (Tile tile : tiles) {
-         customTiles.put(tile.image, tile);
-         // System.out.println(tile.image);
+      try {
+         File packsFolder = new File((inArchive ? "./" : "../") + "tile_packs");
+         try {
+            if (!packsFolder.exists()) Files.createDirectory(Paths.get(packsFolder.getPath()));
+         } catch (Exception e) {
+            e.printStackTrace();
+         }
+         File[] packs = packsFolder.listFiles();
+         Set<Tile> tiles = new HashSet<>();
+         for (File pack : packs) {
+            if (pack.isDirectory()) {
+               File scriptsFolder = new File(pack.getPath().replace("\\", "/") + "/scripts");
+               tiles.addAll(searchForScripts(scriptsFolder));
+            }
+         }
+         for (Tile tile : tiles) {
+            customTiles.put(tile.image, tile);
+            // System.out.println(tile.image);
+         }
+      } catch (Exception e) {
+         System.out.println("One or more tile packs failed to load");
       }
    }
 
