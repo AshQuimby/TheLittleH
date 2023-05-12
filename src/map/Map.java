@@ -23,6 +23,7 @@ import src.Images;
 import src.map.menu.Menu;
 import src.map.enemy.Enemy;
 import src.util.MouseUtils;
+import src.util.SoundEngine;
 import src.util.TextUtils;
 import src.util.Settings;
 
@@ -217,6 +218,7 @@ public class Map extends GameState {
    
    @Override
    public void finishedReading() {
+      SoundEngine.playMusic("music/building_song.wav");
       saveToFile();
       finishedLoading = true;
    }
@@ -225,12 +227,14 @@ public class Map extends GameState {
       if (player != null) playerTrace = player.previousPositions;
       enemies.clear();
       syncTilemap();
+      SoundEngine.playMusic("music/building_song.wav");
       timeUp = 0;
       player = null;
    }
    
    public void startTesting() {
       desyncTilemap();
+      SoundEngine.playMusic("music/" + background + "_song.wav");
       speedrunTimer = 0;
       checkedTime = 0;
       timeLeft = timeLimit;

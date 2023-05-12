@@ -11,6 +11,7 @@ import src.Particle;
 import src.TileEditor;
 import src.util.AABB;
 import src.util.Animation;
+import src.util.SoundEngine;
 import src.util.TextUtils;
 
 // BALLMODE
@@ -34,8 +35,13 @@ public class Ball extends Player {
    public Ball(Player player) {
       super(player);
       if (player instanceof Ball) this.superSlam = ((Ball) player).superSlam;
+
       // Makes the H look like a BALL
       image = "player/ball_h";
+
+      // Re-center player just in case
+      this.x = player.x + player.width / 2 - width / 2;
+      this.y = player.y + player.width / 2 - height / 2 - 8;
    }
       
    @Override
@@ -88,6 +94,7 @@ public class Ball extends Player {
    public void onCollision(boolean horizontal, boolean vertical) {
       if (horizontal) {
          velocityX *= -1f;
+         if (Math.abs(velocityX) > 5f) SoundEngine.playSound("effects/ball_bounce.wav");
          // Minimum BOUNCING BALL SPEED
          velocityX = Math.max(15, Math.abs(velocityX)) * Math.signum(velocityX);
       }
@@ -98,6 +105,7 @@ public class Ball extends Player {
             velocityY *= -1f;
             // Minimum BOUNCING BALL SPEED
             velocityY = Math.max(15, Math.abs(velocityY)) * Math.signum(velocityY);
+            if (Math.abs(velocityY) > 5f) SoundEngine.playSound("effects/ball_bounce.wav");
          }
       }
    }
@@ -106,7 +114,8 @@ public class Ball extends Player {
    public void touchingTile(Tile tile) {
       // Makes bouncy tiles LAUNCH the little H
       if (tile.hasTag("bounce")) {
-         velocityY -= 2;
+         velocityY -= 0.5f;
+         velocityY = Math.min(96f, velocityY);
       }
    }
 

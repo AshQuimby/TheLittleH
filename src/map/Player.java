@@ -16,6 +16,7 @@ import src.Particle;
 import src.TileEditor;
 import src.util.AABB;
 import src.util.Animation;
+import src.util.SoundEngine;
 import src.util.TextUtils;
 import src.util.dialogue.Dialogues;
 import src.map.enemy.Enemy;
@@ -106,10 +107,10 @@ public class Player extends Entity {
    
    public Player(Player player) {
       this(player.startPos);
-      this.x = player.x;
-      this.y = player.y - 8;
       this.velocityX = player.velocityX;
       this.velocityY = player.velocityY;
+      this.width = player.width;
+      this.height = player.height;
       this.doubleJump = player.doubleJump;
       this.savedPlayer = player.savedPlayer;
       this.totalCoinCounts = player.totalCoinCounts;
@@ -127,6 +128,8 @@ public class Player extends Entity {
       this.leftWallFor = player.leftWallFor;
       this.leftGroundFor = player.leftGroundFor;
       this.startPos = player.startPos;
+      this.x = player.x + player.width / 2 - width / 2;
+      this.y = player.y + player.width / 2 - height / 2 - 8;
    }
    
    public Player() {
@@ -179,18 +182,21 @@ public class Player extends Entity {
    
    public void jump(GameState game) {
       if (crushed) return;
-      if (leftGroundFor < 8) {
+      if (leftGroundFor < 6) {
+         SoundEngine.playSound("effects/jump.wav");
          velocityY = -8;
          leftGroundFor = 8;
          jumpStrength++;
          game.addParticle(new Particle(x - 24, y + 32, 0f, 0f, 96, 16, 12, 2, 1, 0f, 0f, 0, 2, "particles/jump.png", 9));
       } else if (jumpReleased && leftWallFor < 8) {
+         SoundEngine.playSound("effects/double_jump.wav");
          velocityY = -26;
          leftWallFor = 8;
          x += -2 * wallDirection;
          velocityX = -16 * wallDirection;
       } else if (jumpReleased && doubleJump) {
          game.addParticle(new Particle(x, y + 16, 0f, 0f, 48, 32, 6, 4, 1, 0f, 0f, 0, 2, "particles/double_jump.png", 9));
+         SoundEngine.playSound("effects/double_jump.wav");
          if (velocityY > 16) coolRoll = (float) (Math.PI * 3);
          if (velocityY > -25) velocityY = -25;
          else velocityY -= 14f;
@@ -233,6 +239,11 @@ public class Player extends Entity {
       }
       
       frame = currentAnimation.stepLooping();
+
+      if (currentAnimation == runAnimation) {
+         if (runAnimation.tick == 0 && runAnimation.frame % 2 == 0) SoundEngine.playSound("effects/step.wav");
+      }
+
       if (end) {
          game.endGame();
          return;
@@ -430,6 +441,7 @@ public class Player extends Entity {
       }
       if (vertical) {
          if (velocityY > 32) {
+            SoundEngine.playSound("effects/hit.wav");
             coolRoll = (float) (Math.PI * 4);
          }
          velocityY = 0;
@@ -453,10 +465,12 @@ public class Player extends Entity {
             if (tile.hasTag("death")) {
                if (playerHitbox.overlaps(tileHitbox)) kill();
             } else if (tile.hasTag("bounce")) {
+               if (velocityY > -30) SoundEngine.playSound("effects/bounce.wav");
                if (velocityY > 36) velocityY *= -1.5f;
                else if (velocityY > -36) velocityY = -36;
             } 
             if (tile.hasTag("checkpoint") && !tile.hasTag("used")) {
+               SoundEngine.playSound("effects/checkpoint.wav");
                startPos.x = tile.x * 64;
                startPos.y = tile.y * 64;
                game.notify("notify_collect_checkpoint", new int[0]);
@@ -469,6 +483,7 @@ public class Player extends Entity {
                game.showTimer();
             } else if (!win && tile.hasTag("end")) {
                game.showTimer();
+               SoundEngine.playSound("effects/win.wav");
                for (int i = 0; i < 16; i++) {
                   game.addParticle(new Particle(x + width / 4, y + height / 4, (float) ((Math.random() - 0.5) * -16), (float) ((Math.random() - 0.5) * -16), 24, 24, 3, 3, 1, 0.96f, 0f, (int) (Math.random() * 2), 0, "particles/twinkle.png", 120));
                }
@@ -483,18 +498,22 @@ public class Player extends Entity {
                      continue;   
                   }
                   if (tile.hasTag("coin")) {
+                     SoundEngine.playSound("effects/coin.wav");
                      coinCounts[tile.tileType]++;
                      if (game.getVolatileTileCount("coin", tile.tileType) == 0) {
+                        SoundEngine.playSound("effects/all_coins_collected.wav");
                         game.notify("notify_all_coins", new int[]{ tile.tileType });
                      }
                   }
                   if (tile.hasTag("powerup")) {
+                     SoundEngine.playSound("effects/powerup_get.wav");
                      if (tile.tileType == 0) game.player = new Player(this);
                      else if (tile.tileType == 1) game.player = new Ball(this);
                      else if (tile.tileType == 2) game.player = new WingedH(this);
                      else if (tile.tileType == 3) game.player = new LimblessH(this);
                   }
                   if (tile.hasTag("key")) {
+                     SoundEngine.playSound("effects/coin.wav");
                      if (tile.hasTag("evil")) {
                         evilKey = new EvilKey(tile.x, tile.y);
                         hasEvilKey = true;
@@ -503,7 +522,8 @@ public class Player extends Entity {
                      keyCount++;   
                   }
                   if (tile.hasTag("timer")) {
-                     if (game.timeLimit > -1) { 
+                     SoundEngine.playSound("effects/powerup_get.wav");
+                     if (game.timeLimit > -1) {
                         switch (tile.getPropertyIndex()) {
                            case 0 :
                               game.timeLeft += 10;
@@ -511,15 +531,15 @@ public class Player extends Entity {
                               break;
                            case 1 :
                               game.timeLeft += 60;
-                              game.startPopup("+60s");
+                              game.startPopup("+30s");
                               break;
                            case 2 :
                               game.timeLeft += 100;
-                              game.startPopup("+100s");
+                              game.startPopup("+60s");
                               break;
                            case 3 :
                               game.timeLeft += 600;
-                              game.startPopup("+600s");
+                              game.startPopup("+120s");
                               break;
                         }
                      }
@@ -532,7 +552,8 @@ public class Player extends Entity {
    }
    
    public void kill() {
-      if (!win) {
+      if (!win && !dead) {
+         SoundEngine.playSound("effects/death.wav");
          dead = true;
          currentAnimation = deathAnimation;
       }
@@ -545,6 +566,7 @@ public class Player extends Entity {
    
    public void win() {
       win = true;
+      SoundEngine.playSound("effects/win.wav");
       velocityX *= 0.8f;
       velocityY *= 0.8f;
       currentAnimation = winAnimation;
