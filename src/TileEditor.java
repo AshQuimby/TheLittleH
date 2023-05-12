@@ -72,7 +72,6 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
    private static MenuType mainMenu;
    
    public TileEditor() {
-      SoundEngine.playMusic("building_song.wav");
       lookingForMap = true;
       levelName = "";
       levelDisplayName = "";
@@ -88,8 +87,9 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
    public static void main(String[] args) {
       Images.load();
       Settings.load();
+      SoundEngine.load();
       hardPause = false;
-      
+
       darkMode = Settings.getBooleanSetting("dark_mode");
       hHue = Settings.getIntSetting("h_hue");
       // soundEngine.load();
@@ -142,6 +142,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
    }
    
    public static void reset() {
+      SoundEngine.playMusic("music/menu_song.wav");
       levelName = "";
       levelDisplayName = "";
       lookingForMap = true;
@@ -169,6 +170,10 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          customTiles.put(tile.image, tile);
          // System.out.println(tile.image);
       }
+   }
+
+   public static void playBlip() {
+      SoundEngine.playSound("effects/blip.wav");
    }
    
    public static Set<Tile> searchForScripts(File startFile) {
@@ -274,6 +279,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          mainMenu.update();
          if (selectedMapIndex != -1) {
             File file = new File(mapsFolderPath + "/" + fileMenu.items[selectedMapIndex]);
+            playBlip();
             mainMenu = new MenuType.LevelOptions(file);
             selectedMapIndex = -1;
          }
@@ -406,6 +412,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
    }
 
    public void returnFromEditor(Map map) {
+      playBlip();
       mainMenu = new MenuType.SaveConfirmation(map);
    }
 
@@ -621,18 +628,23 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                int buttonIndex = menuButtons.getOverlappedElement(MouseUtils.pointerScreenLocation());
                if (buttonIndex == 0) {
                   File file = askForFile();
+                  playBlip();
                   if (file != null) mainMenu = new LevelOptions(file);
                } else if (buttonIndex == 1) {
+                  playBlip();
                   mainMenu = new Legacy();
                } else if (buttonIndex == 2) {
+                  playBlip();
                   mainMenu = new SettingsMenu();
                   // darkMode = !darkMode;
                   //   Settings.setSetting("dark_mode", "" + darkMode);
                   //   window.getContentPane().setCursor(darkMode ? hCursorDark : hCursorLight);
                   // menuButtons.items[buttonIndex] = darkMode ? "ui/light_off.png" : "ui/light_on.png";
                } else if (buttonIndex == 3) {
+                  playBlip();
                   mainMenu = new Creation();
                } else if (buttonIndex == 4){
+                  playBlip();
                   mainMenu = new Help();
                }
                
@@ -653,6 +665,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
             if (button == 1 && released) {
                Rectangle cobweb = new Rectangle(program.getWidth() - 128, 0, 128, 128);
                if (cobweb.contains(MouseUtils.pointerScreenLocation())) {
+                  playBlip();
                   mainMenu = new ButtonMenu();
                }
             }
@@ -759,6 +772,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          @Override
          public void keyboardAction(int keyCode, char keyChar, boolean released) {
             if (released) {
+               playBlip();
                mainMenu = new Default();
             }
          }
@@ -787,12 +801,18 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                
          @Override
          public void keyboardAction(int keyCode, char keyChar, boolean released) {
-            if (released) mainMenu = new Default();
+            if (released) {
+               playBlip();
+               mainMenu = new Default();
+            }
          }
          
          @Override
          public void mouseAction(int button, boolean released) {
-            if (released) mainMenu = new Default();
+            if (released) {
+               playBlip();
+               mainMenu = new Default();
+            }
          }
       }
       
@@ -860,7 +880,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          private int currentStringIndex;
                   
          public SettingsMenu() {
-            settingsButtons = new Menu<>(new String[]{ "nickname", "dark_mode", "default_background_visibility", "old_look_and_feel", "parallax", "debug_mode", "Back" }, 128, 128, 16);
+            settingsButtons = new Menu<>(new String[]{ "nickname", "dark_mode", "default_background_visibility", "old_look_and_feel", "parallax", "music_volume", "sfx_volume", "debug_mode", "Back" }, 128, 128, 16);
             currentString = null;
             currentStringIndex = 0;
          }
@@ -868,7 +888,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          @Override
          public void render(Graphics2D g) {
             int rows = settingsButtons.getRowCount();
-            settingsButtons.setMenuRectangle(program.getWidth() / 2 - rows / 2 * 72 - 72, program.getHeight() / 5, program.getHeight() - 64, false);
+            settingsButtons.setMenuRectangle(program.getWidth() / 2 - 56 - rows * 56, 64, program.getHeight() - 64, false);
             // fileMenu.setPosition(64, 96);
             drawFlatMenuBox(g, settingsButtons.getMenuRectangle());
             Rectangle[] buttons = settingsButtons.getItemButtons();
@@ -897,6 +917,12 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                         program.setHoverInfo("Toggle parallax");
                         break;
                      case 5 :
+                        program.setHoverInfo("Toggle music");
+                        break;
+                     case 6 :
+                        program.setHoverInfo("Toggle sound effects");
+                        break;
+                     case 7 :
                         program.setHoverInfo("Toggle developer mode");
                         break;
                      default :
@@ -924,10 +950,18 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                      Images.drawImage(g, Images.getImage("ui/classic_mode.png"), buttons[i], new Rectangle(0, 0, 16, 16));
                      break;
                   case 4 :
-                     // text = "Paralax";
+                     // text = "Parallax";
                      Images.drawImage(g, Images.getImage("ui/parallax" + (Settings.getBooleanSetting("parallax") ? ".png" : "_off.png")), buttons[i], new Rectangle(0, 0, 16, 16));
                      break;
                   case 5 :
+                     // text = "Music";
+                     Images.drawImage(g, Images.getImage("ui/music_button" + (Settings.getBooleanSetting("music_volume") ? ".png" : "_off.png")), buttons[i], new Rectangle(0, 0, 16, 16));
+                     break;
+                  case 6 :
+                     // text = "SFX";
+                     Images.drawImage(g, Images.getImage("ui/sfx_button" + (Settings.getBooleanSetting("sfx_volume") ? ".png" : "_off.png")), buttons[i], new Rectangle(0, 0, 16, 16));
+                     break;
+                  case 7 :
                      // text = "Developer mode";
                      Images.drawImage(g, Images.getImage("ui/debug_wrench.png"), buttons[i], new Rectangle(0, 0, 16, 16));
                      break;
@@ -953,6 +987,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
             if (currentString != null && !released) {
                switch (keyCode) {
                   case KeyEvent.VK_ESCAPE :
+                     playBlip();
                      mainMenu = new Default();
                      break;
                   case KeyEvent.VK_BACK_SPACE :
@@ -979,26 +1014,41 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                if (buttonIndex > -1) {
                   switch (buttonIndex) {
                      case 0 :
+                        playBlip();
                         currentStringIndex = 0;
                         currentString = Settings.getStringSetting("nickname");
                         break;
-                     case 1 : 
+                     case 1 :
+                        playBlip();
                         darkMode = !darkMode;
                         Settings.setSetting("dark_mode", "" + darkMode);
                         break;
-                     case 2 : 
+                     case 2 :
+                        playBlip();
                         Settings.setSetting("default_background_visibility", "" + !Settings.getBooleanSetting("default_background_visibility"));
                         break;
-                     case 3 : 
+                     case 3 :
+                        playBlip();
                         Settings.setSetting("old_look_and_feel", "" + !Settings.getBooleanSetting("old_look_and_feel"));
                         break;
                      case 4 :
+                        playBlip();
                         Settings.setSetting("parallax", "" + !Settings.getBooleanSetting("parallax"));
                         break;
                      case 5 :
+                        playBlip();
+                        Settings.setSetting("music_volume", "" + !Settings.getBooleanSetting("music_volume"));
+                        break;
+                     case 6 :
+                        playBlip();
+                        Settings.setSetting("sfx_volume", "" + !Settings.getBooleanSetting("sfx_volume"));
+                        break;
+                     case 7 :
+                        playBlip();
                         Settings.setSetting("debug_mode", "" + !Settings.getBooleanSetting("debug_mode"));
                         break;
                      default :
+                        playBlip();
                         mainMenu = new Default();
                   }
                }
@@ -1037,6 +1087,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                         reset();
                      } else {
                         program.setLevelName(displayName, referenceFile);
+                        playBlip();
                         mainMenu = new LevelOptions(referenceFile);
                      }
                   } else if (buttonIndex == 1) {
@@ -1057,6 +1108,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                   } else if (buttonIndex == 3) {
                      confirmDelete = true;
                   } else if (buttonIndex == 4) {
+                     playBlip();
                      mainMenu = new Default();
                   }
                }
@@ -1070,6 +1122,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                   shiftPressed = !released;
                   break;
                case KeyEvent.VK_ESCAPE :
+                  playBlip();
                   mainMenu = new Default();
                   break;
                case KeyEvent.VK_BACK_SPACE :
@@ -1146,12 +1199,14 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                int buttonIndex = menuButtons.getOverlappedElement(MouseUtils.pointerScreenLocation());
                switch (buttonIndex) {
                   case 0 :
+                     playBlip();
                      mainMenu = new Help();
                      break;
                   case 1 :
                      playLevel((inArchive ? "/" : "") + "assets/maps/tutorial.map", inArchive);
                      break;
                   case 2 :
+                     playBlip();
                      mainMenu = new Creation();
                      break;
                }
@@ -1223,6 +1278,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                   }
                   break;
                case KeyEvent.VK_ESCAPE :
+                  playBlip();
                   mainMenu = new Default();
                   break;
                case KeyEvent.VK_BACK_SPACE :
@@ -1271,7 +1327,10 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                   }
                } else if (keyCode == KeyEvent.VK_SHIFT) {
                } else if (keyCode == KeyEvent.VK_ESCAPE) {
-                  if (lookingForMap) mainMenu = new Default();
+                  if (lookingForMap) {
+                     playBlip();
+                     mainMenu = new Default();
+                  }
                   reset();
                } else if (keyCode == KeyEvent.VK_ENTER) {
                   if (game == null) {
@@ -1375,7 +1434,10 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
             if (button == 1 && released) {
                int buttonIndex = menu.getOverlappedElement(MouseUtils.pointerScreenLocation());
                if (buttonIndex != -1) index = buttonIndex;
-               if (index == subtitles.length - 1) mainMenu = new Default();
+               if (index == subtitles.length - 1) {
+                  playBlip();
+                  mainMenu = new Default();
+               }
                else if (index == subtitles.length - 2) playLevel((inArchive ? "/" : "") + "assets/maps/tutorial.map", inArchive);
             }
          }
@@ -1384,6 +1446,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
          public void keyboardAction(int keyCode, char keyChar, boolean released) {
             switch (keyCode) {
                case KeyEvent.VK_ESCAPE :
+                  playBlip();
                   mainMenu = new Default();
                   break;
             }
