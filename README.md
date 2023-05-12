@@ -15,4 +15,6 @@
 
 - Maybe online support (think the Course World from Mario Maker)
 
-   If you find a bug, report it and I will try to fix it. If you want to suggest a feature, say it and if I think it belongs in the game I'll include it.
+If you find a bug, report it and I will try to fix it. If you want to suggest a feature, say it and if I think it belongs in the game I'll include it.
+
+itch.io link: https://ashquimby.itch.io/the-little-h
