@@ -1,11 +1,15 @@
+## The Little H Source Code
+
+  The source code for the Little H
+  Yes, its bad. I made it in jGRASP on a school provided computer instead of doing work.
+  
 ### The Little H
 
   You are the little H, a special operative sent on missions to retrieve the mysterious and powerful "Goal Crystals" after your larger predecessor failed to return in one piece. Your task is simple: get there by any means necessary. Your abilities can include the power to double jump, slide, and wall jump. Use these powers to maneuver your way past obstacles and reach your destination.
 
    Welcome to "The Little H," a game that lets you build and play levels. In the level creator, you have a variety of tiles, tools, and options to mess around with and create levels with. It's basically just Mario Maker but for computers.
-### Note
 
-## THIS GAME IS STILL UNDER ACTIVE DEVELOPMENT
+### Note
 
    There are a few main features planned on being added but will probably take a while to implement:
 
