@@ -573,7 +573,7 @@ public class GameState {
       } else if (correspondingImage.equals("h_fragment")) {
          return new String[]{ "end", "has_properties", "pickup", "volatile", "property_set", "7_set" };
       } else if (correspondingImage.equals("strong_checkpoint")) {
-         return new String[]{ "checkpoint", "notifiable", "notify_collect_checkpoint", "notified_reset_checkpoint" };
+         return new String[]{ "checkpoint", "notifiable", "notify_collect_checkpoint", "notified_reset_checkpoint", "volatile" };
       } else if (correspondingImage.equals("coin_box")) {
          return new String[]{ "has_properties", "property_set", "8_set", "notifiable", "coin_box", "changes_state" };
       } else if (correspondingImage.equals("power_fruit")) {

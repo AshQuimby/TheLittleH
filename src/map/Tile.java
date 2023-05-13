@@ -3,10 +3,7 @@ package src.map;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import src.Images;
 import src.util.AABB;

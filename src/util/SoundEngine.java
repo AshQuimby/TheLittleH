@@ -4,9 +4,11 @@ import static javax.sound.sampled.AudioSystem.*;
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 
 public class SoundEngine {
     public static final boolean inArchive = SoundEngine.class.getResourceAsStream("SoundEngine.class").toString().startsWith("jar");
+    private static HashMap<String, Clip> cache = new HashMap<>();
     public static AudioPiece currentMusic = null;
     public static int musicVolume;
     public static int sfxVolume;
@@ -30,11 +32,21 @@ public class SoundEngine {
 
     public static void playSound(String filePath) {
         if (masterVolume * sfxVolume <= 0f) return;
+        if (cache.containsKey(filePath)) {
+            Clip clip = cache.get(filePath);
+            clip.setMicrosecondPosition(0);
+            clip.start();
+        }
         new AudioPiece(getActualPath(filePath));
     }
 
     public static void playMusic(String filePath) {
         if (masterVolume * musicVolume <= 0f) return;
+        if (cache.containsKey(filePath)) {
+            Clip clip = cache.get(filePath);
+            clip.setMicrosecondPosition(0);
+            clip.start();
+        }
         new AudioPiece(getActualPath(filePath), true);
     }
 
@@ -75,6 +87,7 @@ public class SoundEngine {
                     volume.setValue(-sfxVolume * masterVolume / 1000f);
                 }
                 clip.addLineListener(listener);
+                cache.put(stream, clip);
                 clip.start();
             } catch (Exception e) {
                 e.printStackTrace();

@@ -8,8 +8,8 @@ import java.awt.Polygon;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import src.Images;
 import src.Particle;
@@ -95,7 +95,7 @@ public class Player extends Entity {
       coinCounts = new int[4];
       startTick = true;
       savedPlayer = this;
-      lastTouchedOneWays = new HashSet<>();
+      lastTouchedTiles = new HashSet<>();
       image = "player/h";
       crushed = false;
    }
@@ -396,6 +396,7 @@ public class Player extends Entity {
                for (int i = 0; i < 4; i++) {
                   game.addParticle(new Particle(tileHitbox.getCenterX() - 16, tileHitbox.getCenterY() - 16, (float) ((Math.random() - 0.5) * -20), (float) (Math.random() * -10), 32, 32, 4, 4, 1, 0.98f, 0f, i, 0, "particles/evil_key_box_rubble.png", 30));
                }
+               SoundEngine.playSound("effects/hit.wav");
                game.inGameRemoveTile(tile);
                return false;
             }
@@ -404,6 +405,7 @@ public class Player extends Entity {
             for (int i = 0; i < 4; i++) {
                game.addParticle(new Particle(tileHitbox.getCenterX() - 16, tileHitbox.getCenterY() - 16, (float) ((Math.random() - 0.5) * -8), (float) (Math.random() * -10), 32, 32, 4, 4, 1, 0.98f, 1.2f, i, 0, "particles/key_box_rubble.png", 30));
             }
+            SoundEngine.playSound("effects/hit.wav");
             game.inGameRemoveTile(tile);
             return false;
          }
@@ -449,7 +451,7 @@ public class Player extends Entity {
    }
       
    public void tileInteractions(AABB playerHitbox, List<Tile> collisions, GameState game) {
-      lastTouchedOneWays.clear();
+      Set<Tile> newLastTouchedTiles = new HashSet<>();
       for (Tile tile : collisions) {
          if (crouched && tile.isSolid() && tile.hasTag("half") && (tile.tileType == 0 || tile.tileType == 2)) {
             keysPressed[2] = 0;
@@ -459,13 +461,10 @@ public class Player extends Entity {
          AABB tileHitbox = tile.toAABB();
          if (playerHitbox.overlaps(tileHitbox)) {
             touchingTile(tile);
-            if (tile.hasTag("one_way")) {
-               lastTouchedOneWays.add(tile);
-            }
             if (tile.hasTag("death")) {
                if (playerHitbox.overlaps(tileHitbox)) kill();
             } else if (tile.hasTag("bounce")) {
-               if (velocityY > -30) SoundEngine.playSound("effects/bounce.wav");
+               if (velocityY > -30 && !lastTouchedTiles.contains(tile)) SoundEngine.playSound("effects/bounce.wav");
                if (velocityY > 36) velocityY *= -1.5f;
                else if (velocityY > -36) velocityY = -36;
             } 
@@ -483,7 +482,6 @@ public class Player extends Entity {
                game.showTimer();
             } else if (!win && tile.hasTag("end")) {
                game.showTimer();
-               SoundEngine.playSound("effects/win_level.wav");
                for (int i = 0; i < 16; i++) {
                   game.addParticle(new Particle(x + width / 4, y + height / 4, (float) ((Math.random() - 0.5) * -16), (float) ((Math.random() - 0.5) * -16), 24, 24, 3, 3, 1, 0.96f, 0f, (int) (Math.random() * 2), 0, "particles/twinkle.png", 120));
                }
@@ -547,8 +545,10 @@ public class Player extends Entity {
                   }
                }
             }
+            newLastTouchedTiles.add(tile);
          }
       }
+      lastTouchedTiles = newLastTouchedTiles;
    }
    
    public void kill() {
@@ -566,7 +566,7 @@ public class Player extends Entity {
    
    public void win() {
       win = true;
-      SoundEngine.playSound("effects/win.wav");
+      SoundEngine.playSound("effects/win_level.wav");
       velocityX *= 0.8f;
       velocityY *= 0.8f;
       currentAnimation = winAnimation;

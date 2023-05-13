@@ -94,7 +94,7 @@ public class Ball extends Player {
    public void onCollision(boolean horizontal, boolean vertical) {
       if (horizontal) {
          velocityX *= -1f;
-         if (Math.abs(velocityX) > 5f) SoundEngine.playSound("effects/ball_bounce.wav");
+         if (Math.abs(velocityX) > 8f) SoundEngine.playSound("effects/ball_bounce.wav");
          // Minimum BOUNCING BALL SPEED
          velocityX = Math.max(15, Math.abs(velocityX)) * Math.signum(velocityX);
       }
@@ -105,7 +105,7 @@ public class Ball extends Player {
             velocityY *= -1f;
             // Minimum BOUNCING BALL SPEED
             velocityY = Math.max(15, Math.abs(velocityY)) * Math.signum(velocityY);
-            if (Math.abs(velocityY) > 5f) SoundEngine.playSound("effects/ball_bounce.wav");
+            if (Math.abs(velocityY) > 8f) SoundEngine.playSound("effects/ball_bounce.wav");
          }
       }
    }

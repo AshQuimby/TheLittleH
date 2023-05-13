@@ -1,11 +1,9 @@
 package src.map.enemy;
 
 import java.util.HashSet;
-import java.awt.Graphics2D;
 
 import src.map.Player;
 import src.map.Tile;
-import src.map.Entity;
 import src.map.GameState;
 import src.util.AABB;
 import src.util.Animation;
@@ -29,7 +27,7 @@ public class E extends Enemy {
       this.height = 48;
       image = "enemies/e.png";
       frame = 0;
-      lastTouchedOneWays = new HashSet<>();
+      lastTouchedTiles = new HashSet<>();
       this.parent = parent;
       runAnimation = new Animation(8, 1, 2, 3, 4);
       deathAnimation = new Animation(4, 7, 8, 9, 10, 11, 12);

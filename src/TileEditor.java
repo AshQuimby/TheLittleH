@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Key;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.HashMap;
@@ -1127,22 +1128,22 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
       
          @Override
          public void keyboardAction(int keyCode, char keyChar, boolean released) {
-            switch (keyCode) {
-               case KeyEvent.VK_SHIFT :
-                  shiftPressed = !released;
-                  break;
-               case KeyEvent.VK_ESCAPE :
-                  playBlip();
-                  mainMenu = new Default();
-                  break;
-               case KeyEvent.VK_BACK_SPACE :
-                  if (displayName.length() > 0) displayName = displayName.substring(0, displayName.length() - 1);
-                  break;
-               default :
-                  if (keyChar != KeyEvent.CHAR_UNDEFINED && keyCode != KeyEvent.VK_ESCAPE) {
-                     displayName += keyChar;
-                  }
-                  break;
+            if (keyCode == KeyEvent.VK_SHIFT) shiftPressed = !released;
+            if (!released) {
+               switch (keyCode) {
+                  case KeyEvent.VK_ESCAPE:
+                     playBlip();
+                     mainMenu = new Default();
+                     break;
+                  case KeyEvent.VK_BACK_SPACE:
+                     if (displayName.length() > 0) displayName = displayName.substring(0, displayName.length() - 1);
+                     break;
+                  default:
+                     if (keyChar != KeyEvent.CHAR_UNDEFINED && keyCode != KeyEvent.VK_ESCAPE) {
+                        displayName += keyChar;
+                     }
+                     break;
+               }
             }
          }
       
@@ -1428,8 +1429,8 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                "   There are some tiles that appear to be fruits. These are the enigmatic \"Power Fruits\" found throughout the world. Upon eating a power fruit, the little H will take on a new form that functions differently.\n   These plants include:\n -H-Plant: This \"h\" shaped plant turns you back to your normal form if you’ve eaten something else.\n -Big Orange: This big, round orange activates BALL MODE. Ball mode makes the little H extra bouncy and crouching is replaced with the SUPER SLAM in mid-air!\n -Cloudpepper: This light-as-a-feather fruit makes you grow wings! Your jump is improved and (as long as they are enabled) you can double jump as much as you want. Even if air jumps aren't enabled, holding down the jump button lets you glide through the air.\n -Axeberry: The weapon-shaped axeberry remove's the h's legs and arms. In this form, the h cannot change direction in mid-air. On the bright side, though, you become half usual size and can jump on top of enemies to kill them.",
                "   Dying is not permanent, or at least it shouldn't be. We still don't know how the Big H got completely destroyed... but surely the same thing won't happen to you! Dangerous tiles like malice, spikes, or invisible skulls can end your run, as will falling too far into the void.\n   Additionally, pressing the K key will immediately trigger your kill switch, allowing you to easily reset to your last checkpoint, or letting you free yourself from being trapped in the level.",
                "   Believe it or not, mission control wants you to succeed. To aid you they have dropped H reconstruction stations across levels. Unfortunately, the preboarded got samples get destroyed while being deployed. In order to reactivate one, simply walk past it and you will now respawn there. Some checkpoints have a different appearance and red color. These checkpoints can reprocess genetic material, allowing you to trigger them multiple times.\n   These checkpoints will hopefully allow you to reach the Goal Crystal faster. Once you find one, pick it up and we'll warp you out. Keep in mind that there is no guarantee that only one Goal Crystal exists in each level; if there is a fork in the road, both paths may be equally correct.",
-               "   Some levels can only sustain you for a limited amount of time as indicated by the countdown in the top right corner. Remember, respawning at a checkpoint doesn't reset the timer and running out of time resets you to the beginning of the level; if you see the timer, you should probably act fast.\n\n   Some levels may have magical stopwatches and clocks that somehow extend the amount of time you can spend in the level. Even rarer are the golden variants which, although give you less extra time, send your clock back in time, allowing you to complete levels with lower speedrun times, whatever that means...",               
-               "   Some tiles, namely the so-called \"color cubes\" (despite clearly being squares), exist solely for the purpose of decoration. Use them to give your levels more flair and charm. Or, you can be like some and just put a bunch of amogi everwhere...\n   Decoration can also be used to communicate something to the player without using text. Use decor to make puzzles, markers, or even \"lore.\"",
+               "   Some levels can only sustain you for a limited amount of time as indicated by the countdown in the top right corner. Remember, respawning at a checkpoint doesn't reset the timer and running out of time resets you to the beginning of the level; if you see the timer, you should probably act fast.\n\n   Some levels may have magical stopwatches and clocks that somehow extend the amount of time you can spend in the level.",
+               "   Some tiles, namely the so-called \"color cubes\" (despite clearly being squares), exist solely for the purpose of decoration. Use them to give your levels more flair and charm. Or, you can be like some and just put a bunch of amogi everywhere...\n   Decoration can also be used to communicate something to the player without using text. Use decor to make puzzles, markers, or even \"lore.\"",
                "   Seeing this is unintended...",
                "   Seeing this is unintended..."
             };

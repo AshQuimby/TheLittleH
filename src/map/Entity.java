@@ -3,19 +3,13 @@ package src.map;
 import java.awt.Point;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
 import src.Images;
-import src.Particle;
-import src.TileEditor;
 import src.util.AABB;
-import src.util.Animation;
-import src.util.TextUtils;
 
 public class Entity {
    public float x;
@@ -31,11 +25,11 @@ public class Entity {
    protected boolean touchingGround;
    protected String image;
    
-   protected Set<Tile> lastTouchedOneWays;
+   protected Set<Tile> lastTouchedTiles;
    
    public void update(GameState game) {
       collide(game);
-      lastTouchedOneWays = new HashSet<>();
+      lastTouchedTiles = new HashSet<>();
    }
    
    // Return false to prevent the player from having their velocity set to 0
@@ -104,7 +98,7 @@ public class Entity {
       for (Tile tile : collisions) {
          if (!tile.isSolid()) continue;
          AABB tileHitbox = tile.toAABB();
-         if (tile.hasTag("one_way") && (Math.signum(tile.tileType - 2) == Math.signum(velocityX) || velocityX == 0 || tile.tileType % 2 == 0) || lastTouchedOneWays.contains(tile)) continue;
+         if (tile.hasTag("one_way") && (Math.signum(tile.tileType - 2) == Math.signum(velocityX) || velocityX == 0 || tile.tileType % 2 == 0) || lastTouchedTiles.contains(tile)) continue;
          if (entityHitbox.resolveX(velocityX, tileHitbox)) {
             if (onCollide(game, entityHitbox, tileHitbox, tile, false)) stopX = true;
          }
@@ -117,7 +111,7 @@ public class Entity {
       for (Tile tile : collisions) {
          if (!tile.isSolid()) continue;
          AABB tileHitbox = tile.toAABB();     
-         if (tile.hasTag("one_way") && (Math.signum(tile.tileType - 1) != Math.signum(velocityY) || tile.tileType % 2 != 0) || lastTouchedOneWays.contains(tile)) continue;
+         if (tile.hasTag("one_way") && (Math.signum(tile.tileType - 1) != Math.signum(velocityY) || tile.tileType % 2 != 0) || lastTouchedTiles.contains(tile)) continue;
          if (entityHitbox.resolveY(velocityY, tileHitbox)) {
             if (velocityY > 0) touchingGround = true;
             if (onCollide(game, entityHitbox, tileHitbox, tile, true)) stopY = true;
@@ -144,13 +138,13 @@ public class Entity {
    }
    
    public void tileInteractions(AABB playerHitbox, List<Tile> collisions, GameState game) {
-      lastTouchedOneWays.clear();
+      lastTouchedTiles.clear();
       for (Tile tile : collisions) {
          AABB tileHitbox = tile.toAABB();
          if (playerHitbox.overlaps(tileHitbox)) {
             touchingTile(tile);
             if (tile.hasTag("one_way")) {
-               lastTouchedOneWays.add(tile);
+               lastTouchedTiles.add(tile);
             }
          }
       }
