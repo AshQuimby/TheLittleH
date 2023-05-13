@@ -621,7 +621,7 @@ public class TileEditor extends JPanel implements ActionListener, KeyListener, M
                   break;
             }
             
-            buttonIndex = menuButtons.getOverlappedElement(MouseUtils.pointerScreenLocation());
+            buttonIndex = navigationButtons.getOverlappedElement(MouseUtils.pointerScreenLocation());
             switch (buttonIndex) {
                case 0 :
                   program.info = "Previous level page";
