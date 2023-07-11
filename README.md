@@ -1,6 +1,6 @@
 ## The Little H Source Code
 
-  The source code for the Little H
+  The source code for the Little H <br>
   Yes, its bad. I made it in jGRASP on a school provided computer instead of doing work. I compiled and pushed it in IntelliJ at home.
   
 ### The Little H
